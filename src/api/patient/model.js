@@ -22,7 +22,11 @@ const patientsSchema = new Schema(
       default: "Codicote",
     },
     room: { type: String, required: true },
-    foodChart: [FoodSchema],
+    foodChart: {
+      type: Schema.Types.ObjectId,
+
+      ref: "Foodchart",
+    },
   },
 
   { timestamps: true }

@@ -3,6 +3,7 @@ import cors from "cors";
 import listEndpoints from "express-list-endpoints";
 import mongoose from "mongoose";
 import patientRouter from "./api/patient/index.js";
+import foodRouter from "./api/foodchart/index.js";
 
 const server = express();
 const port = process.env.PORT || 3001;
@@ -13,6 +14,7 @@ server.use(express.json());
 
 //...........................Endpoint.....................
 server.use("/patient", patientRouter);
+server.use("/foodchart", foodRouter);
 
 //................... Errorhandlers......................
 
