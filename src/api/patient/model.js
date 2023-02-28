@@ -18,15 +18,10 @@ const patientsSchema = new Schema(
     ward: {
       type: String,
       required: true,
-      enum: ["Codicote", "Benington", "Digswel"],
+      enum: ["Codicote", "Benington", "Digswell"],
       default: "Codicote",
     },
     room: { type: String, required: true },
-    foodChart: {
-      type: Schema.Types.ObjectId,
-
-      ref: "Foodchart",
-    },
   },
 
   { timestamps: true }

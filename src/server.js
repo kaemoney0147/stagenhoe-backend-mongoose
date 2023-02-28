@@ -4,7 +4,10 @@ import listEndpoints from "express-list-endpoints";
 import mongoose from "mongoose";
 import patientRouter from "./api/patient/index.js";
 import foodRouter from "./api/foodchart/index.js";
-
+import personcareRouter from "./api/personalcare/index.js";
+import fluidRouter from "./api/fluidchart/index.js";
+import usersRouter from "./api/users/index.js";
+import bowelRouter from "./api/bowelchart/index.js";
 const server = express();
 const port = process.env.PORT || 3001;
 
@@ -15,7 +18,10 @@ server.use(express.json());
 //...........................Endpoint.....................
 server.use("/patient", patientRouter);
 server.use("/foodchart", foodRouter);
-
+server.use("/personalcare", personcareRouter);
+server.use("/fluid", fluidRouter);
+server.use("/users", usersRouter);
+server.use("/bowel", bowelRouter);
 //................... Errorhandlers......................
 
 mongoose.connect(process.env.MONGOOSE_URL);

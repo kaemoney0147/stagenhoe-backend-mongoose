@@ -6,10 +6,10 @@ const foodSchema = new Schema({
     type: String,
     required: true,
     enum: ["Breakfast", "Lunch", "Dinner"],
-    default: "Breakfast",
   },
-  date: { type: String, required: true },
+  date: { type: Date, required: true },
   time: { type: String, required: true },
+  offered: { type: String, required: true },
   amountoffered: { type: String, required: true },
   amountaccepted: { type: String, required: true },
   patient: {

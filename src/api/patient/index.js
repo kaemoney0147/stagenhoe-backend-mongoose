@@ -1,6 +1,6 @@
 import express from "express";
 import PatientModel from "../patient/model.js";
-
+import queryString from "mongoose";
 const patientRouter = express.Router();
 
 patientRouter.post("/", async (req, res, next) => {
@@ -17,12 +17,19 @@ patientRouter.post("/", async (req, res, next) => {
 });
 patientRouter.get("/", async (req, res, next) => {
   try {
-    const patient = await PatientModel.find(req.body);
-    res.send(patient);
+    let query = {};
+    if (req.query.ward || req.query.firstName) {
+      query = {
+        $or: [{ ward: req.query.ward }, { firstName: req.query.firstName }],
+      };
+    }
+    const patients = await PatientModel.find(query);
+    res.send(patients);
   } catch (error) {
     next(error);
   }
 });
+
 patientRouter.get("/:patientId", async (req, res, next) => {
   try {
     const patient = await PatientModel.findById(req.params.patientId);
