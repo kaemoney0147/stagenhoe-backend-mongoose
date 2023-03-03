@@ -16,12 +16,17 @@ patientRouter.post("/", async (req, res, next) => {
   }
 });
 patientRouter.get("/", async (req, res, next) => {
+  const { ward, firstName, Age } = req.query;
   try {
     let query = {};
-    if (req.query.ward || req.query.firstName) {
-      query = {
-        $or: [{ ward: req.query.ward }, { firstName: req.query.firstName }],
-      };
+    if (ward) {
+      query.ward = ward;
+    }
+    if (firstName) {
+      query.firstName = firstName;
+    }
+    if (Age) {
+      query.Age = Age;
     }
     const patients = await PatientModel.find(query);
     res.send(patients);

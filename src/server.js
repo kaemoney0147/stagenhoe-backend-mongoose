@@ -8,6 +8,7 @@ import personcareRouter from "./api/personalcare/index.js";
 import fluidRouter from "./api/fluidchart/index.js";
 import usersRouter from "./api/users/index.js";
 import bowelRouter from "./api/bowelchart/index.js";
+import vitalRouter from "./api/vitalexamination/index.js";
 const server = express();
 const port = process.env.PORT || 3001;
 
@@ -22,6 +23,7 @@ server.use("/personalcare", personcareRouter);
 server.use("/fluid", fluidRouter);
 server.use("/users", usersRouter);
 server.use("/bowel", bowelRouter);
+server.use("/vital", vitalRouter);
 //................... Errorhandlers......................
 
 mongoose.connect(process.env.MONGOOSE_URL);

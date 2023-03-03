@@ -51,9 +51,9 @@ fluidRouter.get("/patient/:patientId", async (req, res, next) => {
   try {
     const posts = await FluidModel.find({
       patient: req.params.patientId,
-    }).populate({
-      path: "patient",
     });
+    // const { running, amounttaken } = posts[0];
+    // console.log("here i am", amounttaken);
     if (posts) {
       res.send(posts);
     }
