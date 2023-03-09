@@ -1,7 +1,18 @@
 import express from "express";
 import PatientModel from "../patient/model.js";
-import queryString from "mongoose";
+import multer from "multer";
+import { CloudinaryStorage } from "multer-storage-cloudinary";
+import { v2 as cloudinary } from "cloudinary";
 const patientRouter = express.Router();
+
+const cloudinaryUpload = multer({
+  storage: new CloudinaryStorage({
+    cloudinary,
+    params: {
+      folder: "sueryder/patient",
+    },
+  }),
+}).single("image");
 
 patientRouter.post("/", async (req, res, next) => {
   try {
@@ -15,6 +26,31 @@ patientRouter.post("/", async (req, res, next) => {
     next(error);
   }
 });
+
+patientRouter.post(
+  "/:patientId/upload",
+  cloudinaryUpload,
+  async (req, res, next) => {
+    const { patientId } = req.params;
+    const url = req.file.path;
+    console.log("this is url", req.file);
+    try {
+      const updatedPatient = await PatientModel.findByIdAndUpdate(
+        patientId,
+        { image: url },
+        { new: true, runValidators: true }
+      );
+      if (updatedPatient) {
+        res
+          .status(201)
+          .send({ message: `this patient image as successfuly updated` });
+      }
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
 patientRouter.get("/", async (req, res, next) => {
   const { ward, firstName, Age } = req.query;
   try {
@@ -33,6 +69,25 @@ patientRouter.get("/", async (req, res, next) => {
   } catch (error) {
     next(error);
   }
+});
+
+patientRouter.get("/chart", async (req, res, next) => {
+  try {
+    const admissionSummary = await PatientModel.aggregate([
+      {
+        $group: {
+          _id: {
+            year: { $year: { $toDate: "$admission.date" } },
+            month: { $month: { $toDate: "$admission.date" } },
+          },
+          numberOfPatients: {
+            $sum: 1,
+          },
+        },
+      },
+    ]);
+    res.send(admissionSummary);
+  } catch (error) {}
 });
 
 patientRouter.get("/:patientId", async (req, res, next) => {
@@ -61,11 +116,13 @@ patientRouter.put("/:patientId", async (req, res, next) => {
     next(error);
   }
 });
-patientRouter.delete("/:patientId", async (req, res, next) => {
+patientRouter.delete("/:patientId/delete", async (req, res, next) => {
   try {
-    const deletedPatient = PatientModel.findByIdAndDelete(req.params.patientId);
+    const deletedPatient = await PatientModel.findByIdAndDelete(
+      req.params.patientId
+    );
     if (deletedPatient) {
-      res.status(204).send();
+      res.status(204).send("this patient as being deleted sucessfully");
     }
   } catch (error) {
     next(error);

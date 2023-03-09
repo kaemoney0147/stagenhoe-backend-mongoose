@@ -1,49 +1,54 @@
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 
-const Schema = mongoose.Schema;
+const { Schema, model } = mongoose;
 
-const UserSchema = new Schema(
+const usersSchema = new Schema(
   {
     username: { type: String, required: true },
     password: { type: String, required: true },
+    role: {
+      type: String,
+      enum: ["Guest", "Admin"],
+      default: "Guest",
+      required: true,
+    },
+    avatar: { type: String, required: false },
   },
   { timestamps: true }
 );
 
-UserSchema.pre("save", async function (next) {
+usersSchema.pre("save", async function (next) {
   const currentUser = this;
   if (currentUser.isModified("password")) {
     const plainPW = currentUser.password;
-    const hash = await bcrypt.hash(plainPW, 11);
+    const hash = await bcrypt.hash(plainPW, 10);
     currentUser.password = hash;
   }
   next();
 });
 
-UserSchema.methods.toJSON = function () {
-  const user = this.toObject();
+usersSchema.methods.toJSON = function () {
+  const userDocument = this;
+  const user = userDocument.toObject();
   delete user.password;
-  delete user.__v;
   delete user.createdAt;
   delete user.updatedAt;
+  delete user.__v;
   return user;
 };
 
-UserSchema.static("findByCredentials", async function (username, password) {
+usersSchema.static("checkCredentials", async function (username, password) {
   const user = await this.findOne({ username });
 
   if (user) {
     const passwordMatch = await bcrypt.compare(password, user.password);
-
     if (passwordMatch) {
       return user;
     } else {
       return null;
     }
-  } else {
-    return null;
   }
 });
 
-export default mongoose.model("User", UserSchema);
+export default model("User", usersSchema);

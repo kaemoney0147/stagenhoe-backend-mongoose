@@ -6,9 +6,9 @@ const patientsSchema = new Schema(
     title: { type: String, required: true },
     firstName: { type: String, required: true },
     lastName: { type: String, required: true },
-    image: { type: String, required: true },
+    image: { type: String, required: false },
     dob: { type: String, required: true },
-    Age: { type: Number, required: true },
+    age: { type: Number, required: false },
     Gender: { type: String, required: true },
     discription: { type: String, required: false },
     admission: {
