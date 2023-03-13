@@ -9,6 +9,8 @@ import fluidRouter from "./api/fluidchart/index.js";
 import usersRouter from "./api/users/index.js";
 import bowelRouter from "./api/bowelchart/index.js";
 import vitalRouter from "./api/vitalexamination/index.js";
+import respRouter from "./api/reposition/index.js";
+import bodyMapRouter from "./api/bodymap/index.js";
 const server = express();
 const port = process.env.PORT || 3001;
 
@@ -24,6 +26,8 @@ server.use("/fluid", fluidRouter);
 server.use("/users", usersRouter);
 server.use("/bowel", bowelRouter);
 server.use("/vital", vitalRouter);
+server.use("/resposition", respRouter);
+server.use("/bodymap", bodyMapRouter);
 //................... Errorhandlers......................
 
 mongoose.connect(process.env.MONGOOSE_URL);
