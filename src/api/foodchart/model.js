@@ -7,7 +7,7 @@ const foodSchema = new Schema({
     required: true,
     enum: ["Breakfast", "Lunch", "Dinner"],
   },
-  date: { type: Date, required: true },
+  date: { type: String, required: true },
   time: { type: String, required: true },
   offered: { type: String, required: true },
   amountoffered: { type: String, required: true },

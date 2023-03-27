@@ -52,18 +52,22 @@ patientRouter.post(
 );
 
 patientRouter.get("/", async (req, res, next) => {
-  const { ward, firstName, Age } = req.query;
+  let { ward, firstName } = req.query;
+  let query = {};
+
   try {
-    let query = {};
-    if (ward) {
-      query.ward = ward;
+    if (ward || firstName) {
+      ward = ward ? ward.toLowerCase() : ward;
+      firstName = firstName ? firstName.toLowerCase() : firstName;
+
+      query = {
+        $or: [
+          { ward: { $regex: new RegExp("^" + ward, "i") } },
+          { firstName: { $regex: new RegExp("^" + firstName, "i") } },
+        ],
+      };
     }
-    if (firstName) {
-      query.firstName = firstName;
-    }
-    if (Age) {
-      query.Age = Age;
-    }
+
     const patients = await PatientModel.find(query);
     res.send(patients);
   } catch (error) {

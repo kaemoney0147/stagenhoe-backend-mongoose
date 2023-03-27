@@ -2,7 +2,8 @@ import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 
 const { Schema, model } = mongoose;
-
+const url =
+  "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTJIyiiNbz3VC9Afr-LqWpcw7loxjPnacfZSA&usqp=CAU";
 const usersSchema = new Schema(
   {
     username: { type: String, required: true },
@@ -13,7 +14,7 @@ const usersSchema = new Schema(
       default: "Guest",
       required: true,
     },
-    avatar: { type: String, required: false },
+    avatar: { type: String, required: false, default: url },
   },
   { timestamps: true }
 );

@@ -6,6 +6,7 @@ import multer from "multer";
 import { CloudinaryStorage } from "multer-storage-cloudinary";
 import { v2 as cloudinary } from "cloudinary";
 import q2m from "query-to-mongo";
+import createHttpError from "http-errors";
 import { JWTAuthMiddleware } from "../lib/auth/jwtAuth.js";
 import { createAccessToken } from "../lib/auth/tools.js";
 
@@ -21,43 +22,54 @@ const cloudinaryUpload = multer({
 
 const usersRouter = express.Router();
 
-usersRouter.get("/", async (req, res, next) => {
-  try {
-    const query = q2m(req.query);
-    const total = await UserModel.countDocuments(query.criteria);
-    const users = await UserModel.find(query.criteria, query.options.fields)
-      .skip(query.options.skip)
-      .limit(query.options.limit)
-      .sort(query.options.sort);
-    res.send({ links: query.links("/users", total), total, users });
-  } catch (error) {
-    next(error);
-  }
-});
+usersRouter.get(
+  "/",
+  JWTAuthMiddleware,
+  // AdminOnlyMiddleware,
 
-usersRouter.post("/register", cloudinaryUpload, async (req, res, next) => {
-  try {
-    const { username, password } = req.body;
-
-    const existingUser = await UserModel.findOne({
-      $or: [{ username }, { password }],
-    });
-    if (existingUser) {
-      const existingField =
-        existingUser.username === username ? "username" : "username";
-      return res
-        .status(400)
-        .send({ message: `user with this ${existingField} already exists` });
+  async (req, res, next) => {
+    try {
+      const query = q2m(req.query);
+      const total = await UserModel.countDocuments(query.criteria);
+      const users = await UserModel.find(query.criteria, query.options.fields)
+        .skip(query.options.skip)
+        .limit(query.options.limit)
+        .sort(query.options.sort);
+      res.send({ links: query.links("/users", total), total, users });
+    } catch (error) {
+      next(error);
     }
-
-    const newUser = new UserModel(req.body);
-    const savedUser = await newUser.save();
-
-    res.status(201).send(savedUser);
-  } catch (error) {
-    next(error);
   }
-});
+);
+
+usersRouter.post(
+  "/register",
+  AdminOnlyMiddleware,
+  cloudinaryUpload,
+  async (req, res, next) => {
+    try {
+      const { username, password } = req.body;
+
+      const existingUser = await UserModel.findOne({
+        $or: [{ username }, { password }],
+      });
+      if (existingUser) {
+        const existingField =
+          existingUser.username === username ? "username" : "username";
+        return res
+          .status(400)
+          .send({ message: `user with this ${existingField} already exists` });
+      }
+
+      const newUser = new UserModel(req.body);
+      const savedUser = await newUser.save();
+
+      res.status(201).send(savedUser);
+    } catch (error) {
+      next(error);
+    }
+  }
+);
 
 usersRouter.get("/me", JWTAuthMiddleware, async (req, res, next) => {
   try {
@@ -73,25 +85,30 @@ usersRouter.get("/me", JWTAuthMiddleware, async (req, res, next) => {
   }
 });
 
-usersRouter.get("/:id", JWTAuthMiddleware, async (req, res, next) => {
-  try {
-    const user = await UserModel.findById(req.params.id);
-    if (user) {
-      res.send(user);
-    } else {
-      next(createError(404, `User with id ${req.params.id} not found!`));
+usersRouter.get(
+  "/:id",
+  JWTAuthMiddleware,
+  AdminOnlyMiddleware,
+  async (req, res, next) => {
+    try {
+      const user = await UserModel.findById(req.params.id);
+      if (user) {
+        res.send(user);
+      } else {
+        next(createError(404, `User with id ${req.params.id} not found!`));
+      }
+    } catch (error) {
+      next(error);
     }
-  } catch (error) {
-    next(error);
   }
-});
+);
 
-usersRouter.put("/me", JWTAuthMiddleware, async (req, res, next) => {
+usersRouter.put("/:userId", AdminOnlyMiddleware, async (req, res, next) => {
   try {
-    const user = await UserModel.findById(req.user._id);
+    const user = await UserModel.findById(req.user.userId);
     if (user) {
       const updated = await UserModel.findByIdAndUpdate(
-        req.user._id,
+        req.user.userId,
         req.body,
         {
           runValidators: true,
@@ -113,7 +130,7 @@ usersRouter.post("/login", async (req, res, next) => {
     const user = await UserModel.checkCredentials(username, password);
 
     if (user) {
-      const payload = { _id: user._id };
+      const payload = { _id: user._id, role: user.role };
       const accessToken = await createAccessToken(payload);
       res.send({ accessToken });
     } else {
@@ -124,13 +141,31 @@ usersRouter.post("/login", async (req, res, next) => {
   }
 });
 
-usersRouter.delete("/me", AdminOnlyMiddleware, async (req, res, next) => {
+usersRouter.post("/admin", async (req, res, next) => {
   try {
-    const user = await UserModel.findById(req.user._id);
+    const { username, password } = req.body;
+    const user = await UserModel.checkCredentials(username, password);
+
     if (user) {
-      res.status(204).send();
+      const payload = { _id: user._id, role: user.role };
+      const accessToken = await createAccessToken(payload);
+      res.send({ accessToken });
     } else {
-      next(createError(404, `User with id ${req.user._id} not found!`));
+      next(createError(401, "Wrong credentials!"));
+    }
+  } catch (error) {
+    next(error);
+  }
+});
+
+usersRouter.delete("/:userId", AdminOnlyMiddleware, async (req, res, next) => {
+  try {
+    const userToDelete = await UserModel.findById(req.params.userId);
+    if (userToDelete) {
+      await UserModel.findByIdAndDelete(req.params.userId);
+      res.status(205).send();
+    } else {
+      createHttpError(404, `User with id ${req.params.userId} is not found`);
     }
   } catch (error) {
     next(error);

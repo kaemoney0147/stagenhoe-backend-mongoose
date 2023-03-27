@@ -11,6 +11,13 @@ import bowelRouter from "./api/bowelchart/index.js";
 import vitalRouter from "./api/vitalexamination/index.js";
 import respRouter from "./api/reposition/index.js";
 import bodyMapRouter from "./api/bodymap/index.js";
+import {
+  badRequestHandler,
+  forbiddenHandler,
+  genericErrorHAndler,
+  unauthorizedHandler,
+  notFoundHandler,
+} from "./errorHandlers.js";
 const server = express();
 const port = process.env.PORT || 3001;
 
@@ -29,6 +36,11 @@ server.use("/vital", vitalRouter);
 server.use("/resposition", respRouter);
 server.use("/bodymap", bodyMapRouter);
 //................... Errorhandlers......................
+server.use(badRequestHandler);
+server.use(unauthorizedHandler);
+server.use(forbiddenHandler);
+server.use(notFoundHandler);
+server.use(genericErrorHAndler);
 
 mongoose.connect(process.env.MONGOOSE_URL);
 
