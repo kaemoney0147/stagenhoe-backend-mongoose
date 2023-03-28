@@ -1,5 +1,5 @@
 import express from "express";
-import BodyMapModel from "../Bodymap/model.js";
+import BodyMapModel from "../bodymap/model.js";
 
 const bodyMapRouter = express.Router();
 
