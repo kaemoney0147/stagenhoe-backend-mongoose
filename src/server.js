@@ -34,7 +34,7 @@ const port = process.env.PORT || 3001;
 // };
 
 //......................Middleware..................
-server.use(cors({ origin: process.env.FE_URL_PROD }));
+server.use(cors({ origin: process.env.FE_PROD_URL }));
 server.use(express.json());
 
 //...........................Endpoint.....................
