@@ -21,7 +21,11 @@ import {
 const server = express();
 const port = process.env.PORT || 3001;
 
-const whitelist = [process.env.FE_URL, process.env.FE_URL_PROD];
+const whitelist = [
+  process.env.FE_URL,
+  process.env.FE_URL_PROD,
+  process.env.FE_VERCEL_URL,
+];
 
 const corsOpts = {
   origin: (origin, corsNext) => {
