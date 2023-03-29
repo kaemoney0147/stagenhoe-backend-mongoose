@@ -21,24 +21,20 @@ import {
 const server = express();
 const port = process.env.PORT || 3001;
 
-const whitelist = [
-  process.env.FE_URL,
-  process.env.FE_URL_PROD,
-  process.env.FE_VERCEL_URL,
-];
+// const whitelist = [process.env.FE_URL, process.env.FE_URL_PROD];
 
-const corsOpts = {
-  origin: (origin, corsNext) => {
-    if (!origin || whitelist.indexOf(origin) !== -1) {
-      corsNext(null, true);
-    } else {
-      corsNext(createHttpError(400, "Current Origin is not in whitelist"));
-    }
-  },
-};
+// const corsOpts = {
+//   origin: (origin, corsNext) => {
+//     if (!origin || whitelist.indexOf(origin) !== -1) {
+//       corsNext(null, true);
+//     } else {
+//       corsNext(createHttpError(400, "Current Origin is not in whitelist"));
+//     }
+//   },
+// };
 
 //......................Middleware..................
-server.use(cors(corsOpts));
+server.use(cors());
 server.use(express.json());
 
 //...........................Endpoint.....................
