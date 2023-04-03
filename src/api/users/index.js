@@ -44,7 +44,7 @@ usersRouter.get(
 
 usersRouter.post(
   "/register",
-  AdminOnlyMiddleware,
+  // AdminOnlyMiddleware,
   cloudinaryUpload,
   async (req, res, next) => {
     try {
@@ -158,7 +158,7 @@ usersRouter.post("/admin", async (req, res, next) => {
   }
 });
 
-usersRouter.delete("/:userId", AdminOnlyMiddleware, async (req, res, next) => {
+usersRouter.delete("/:userId", async (req, res, next) => {
   try {
     const userToDelete = await UserModel.findById(req.params.userId);
     if (userToDelete) {

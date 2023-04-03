@@ -21,7 +21,8 @@ const patientsSchema = new Schema(
       enum: ["Codicote", "Benington", "Digswell"],
       default: "Codicote",
     },
-    room: { type: String, required: true },
+    disease: { type: String, required: false },
+    room: { type: Number, required: true },
   },
 
   { timestamps: true }

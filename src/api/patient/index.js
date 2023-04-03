@@ -14,7 +14,7 @@ const cloudinaryUpload = multer({
   }),
 }).single("image");
 
-patientRouter.post("/", async (req, res, next) => {
+patientRouter.post("/", cloudinaryUpload, async (req, res, next) => {
   try {
     const newPatient = new PatientModel({
       ...req.body,

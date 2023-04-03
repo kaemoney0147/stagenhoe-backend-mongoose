@@ -26,7 +26,10 @@ foodRouter.post("/:patientId", async (req, res, next) => {
 });
 foodRouter.get("/", async (req, res, next) => {
   try {
-    const foodchart = await FoodchartModel.find(req.body);
+    const foodchart = await FoodchartModel.find().populate({
+      path: "patient",
+      select: "firstName title lastName ward",
+    });
     res.send(foodchart);
   } catch (error) {
     next();
@@ -61,6 +64,19 @@ foodRouter.get("/patient/:patientId", async (req, res, next) => {
     }
   } catch (err) {
     next(err);
+  }
+});
+
+foodRouter.delete("/:foodchartId/delete", async (req, res, next) => {
+  try {
+    const deletedPatient = await FoodchartModel.findByIdAndDelete(
+      req.params.foodchartId
+    );
+    if (deletedPatient) {
+      res.status(204).send("this patient fluid deleted sucessfully");
+    }
+  } catch (error) {
+    next(error);
   }
 });
 

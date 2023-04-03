@@ -61,5 +61,17 @@ fluidRouter.get("/patient/:patientId", async (req, res, next) => {
     next(err);
   }
 });
+fluidRouter.delete("/:fluidId/delete", async (req, res, next) => {
+  try {
+    const deletedPatient = await FluidModel.findByIdAndDelete(
+      req.params.fluidId
+    );
+    if (deletedPatient) {
+      res.status(204).send("this patient fluid deleted sucessfully");
+    }
+  } catch (error) {
+    next(error);
+  }
+});
 
 export default fluidRouter;

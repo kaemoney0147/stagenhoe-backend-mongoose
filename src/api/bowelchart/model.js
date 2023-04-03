@@ -12,7 +12,7 @@ const bowelSchema = new Schema({
     enum: ["Type1", "Type2", "Type3", "Type4", "Type5", "Type6", "Type7"],
   },
   intervention: { type: String, required: false },
-  signature: { type: String, required: false },
+  signature: { type: String, required: true },
   patient: {
     type: Schema.Types.ObjectId,
     ref: "Patient",
