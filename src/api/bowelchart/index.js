@@ -60,4 +60,17 @@ bowelRouter.get("/patient/:patientId", async (req, res, next) => {
   }
 });
 
+bowelRouter.delete("/:bowelId/delete", async (req, res, next) => {
+  try {
+    const deletedPatient = await BowelModel.findByIdAndDelete(
+      req.params.bowelId
+    );
+    if (deletedPatient) {
+      res.status(204).send("this patient  bowel sucessfully deleted");
+    }
+  } catch (error) {
+    next(error);
+  }
+});
+
 export default bowelRouter;
